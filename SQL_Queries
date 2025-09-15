@@ -1,0 +1,72 @@
+/*CREATE TABLE Products (
+    ProductID INT PRIMARY KEY IDENTITY(1,1),
+    Name VARCHAR(70) NOT NULL,
+    Category VARCHAR(60),
+    Price DECIMAL(10,2) NOT NULL,
+    Quantity INT NOT NULL
+);
+
+-- -- Delete existing records
+--DELETE FROM Products;
+
+-- Reset identity
+--DBCC CHECKIDENT ('Products', RESEED, 0);
+
+CREATE TABLE Suppliers (
+    SupplierID INT IDENTITY(1,1) PRIMARY KEY,
+    Name VARCHAR(70) NOT NULL,
+    Contact NVARCHAR(50),
+    Email NVARCHAR(100)
+);*/
+
+
+/*CREATE TABLE StockTransactions (
+    TransactionID INT PRIMARY KEY IDENTITY(1,1),
+    ProductID INT NOT NULL,
+    Category VARCHAR(60),
+    TransactionType VARCHAR(10) NOT NULL, -- 'IN' or 'OUT'
+    Quantity INT NOT NULL,
+    TransactionDate DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);*/
+
+-- Current Stock
+SELECT 
+    ProductID,
+    Name AS ProductName,
+    Category,
+    Price,
+    Quantity,
+    (Price * Quantity) AS TotalValue
+FROM Products
+ORDER BY Category, Name;
+
+-- Low Stock
+DECLARE @LowStockThreshold INT = 10;
+
+SELECT 
+    ProductID,
+    Name AS ProductName,
+    Category,
+    Price,
+    Quantity,
+    (Price * Quantity) AS TotalValue
+FROM Products
+WHERE Quantity <= @LowStockThreshold
+ORDER BY Category, Name;
+
+
+-- Transaction History
+SELECT 
+    t.TransactionID,
+    p.Name AS Product,
+    t.Category,
+    t.TransactionType,
+    t.Quantity,
+    t.TransactionDate
+FROM StockTransactions t
+INNER JOIN Products p ON t.ProductID = p.ProductID
+ORDER BY t.TransactionDate DESC;
+
+
+--Select * from StockTransactions;
